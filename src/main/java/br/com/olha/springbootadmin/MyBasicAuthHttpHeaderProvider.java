@@ -95,10 +95,14 @@ public class MyBasicAuthHttpHeaderProvider implements HttpHeadersProvider {
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(loginUrl, entity, String.class);
+        ResponseEntity<Map> responseEntity = restTemplate.postForEntity(loginUrl, entity, Map.class);
 
-        List<String> header = responseEntity.getHeaders().get("Authorization");
+        String token = (String) responseEntity.getBody().get("token");
+        if (token == null) {
+            List<String> header = responseEntity.getHeaders().get("Authorization");
+            token = header.isEmpty() ? "" : header.get(0);
+        }
 
-        return header.isEmpty() ? "" : header.get(0);
+        return token;
     }
 }
